@@ -14,4 +14,24 @@ async function startTask() {
     return data;
 }
 
+async function submitAnswer(answer) {
+    const response = await fetch(`${RIS_BASE_URL}/answer`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            answer: answer,
+            player: PLAYER_EMAIL,
+        }),
+    });
+    const data = await response.json();
+    console.log('Answer submitted:', data);
+    return data;
+}
+
+async function fetchSolarSystemData(endpoint) {
+    
+}
+
 
