@@ -31,7 +31,9 @@ async function submitAnswer(answer) {
 }
 
 async function fetchSolarSystemData(endpoint) {
-    
+    const response = await fetch(`${SOLAR_SYSTEM_API_URL}${endpoint}`);
+    const data = await response.json();
+    return data;
 }
 
 
