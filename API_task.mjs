@@ -36,4 +36,29 @@ async function fetchSolarSystemData(endpoint) {
     return data;
 }
 
+async function solveTask() {
+    try {
+        const startData = await startTask();
+
+        const plutoData = await fetchSolarSystemData('bodies/pluto');
+        console.log('Pluto data:', plutoData);
+
+        const plutoMass = plutoData.mass?.massValue;
+        if (plutoMass) {
+            const answerResponse = await submitAnswer(plutoMass);
+            console.log('Answer: ', answerResponse);
+        }
+
+        const skeletonKey = answerResponse?.skeletonKey;
+        if (skeletonKey) {
+            const fs = require('fs');
+            fs.writeFileSync('skeletonKey.txt', skeletonKey);
+            console.log('Skeleton Key saved in created txt document "skeletonKey.txt"');
+        }  
+    } catch (error) {
+        console.error('Error during mission:', error);
+    }
+}
+
+solveTask();
 
