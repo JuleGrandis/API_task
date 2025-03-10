@@ -107,7 +107,7 @@ async function jupiterLargestMoon () {
 
     for (const moon of jupiterData.moons) {
         try {
-            const moonId = moon.moon;
+            const moonId = encodeURIComponent(moon.moon);
             const moonData = await fetchSolarSystemData(`/bodies/${moonId}`);
 
             if (moonData.meanRadius && moonData.meanRadius > maxRadius) {
