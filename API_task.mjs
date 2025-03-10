@@ -8,7 +8,6 @@ const RIS_BASE_URL = 'https://spacescavanger.onrender.com';
 async function startTask() {
     const response = await fetch(`${RIS_BASE_URL}/start?player=${PLAYER_EMAIL}`);
     const data = await response.json();
-    console.log('Task started:', data);
     return data;
 }
 
@@ -36,35 +35,95 @@ async function fetchSolarSystemData(endpoint) {
 async function sunPin () {
     const sunData = await fetchSolarSystemData('/bodies/sun');
 
-    const pinCode = sunData.equatorialRadius - sunData.meanRadius;
+    const equatorialRadius = sunData.equaRadius;
+    const meanRadius = sunData.meanRadius;
+
+    const pinCode = equatorialRadius - meanRadius;
     console.log(`Pin code: ${pinCode}`);
   
+    return pinCode;
 }
+
+async function findClosestAxialTilt() {
+    
+    const bodiesData = await fetchSolarSystemData('bodies/');
+    const planets = bodiesData.bodies.filter(body => body.isPlanet);
+    const earth = planets.find(planet => planet.id === 'terre');
+
+    const earthAxialTilt = earth.axialTilt;
+    console.log(`Earth's axial tilt: ${earthAxialTilt}`);
+
+    let closestPlanet = null;
+    let smallestDiff = Infinity;
+
+    for (const planet of planets) {
+        if (planet.id !== 'terre' && planet.axialTilt !== undefined) {
+            const diff = Math.abs(planet.axialTilt - earthAxialTilt);
+            if (diff < smallestDiff) {
+                smallestDiff = diff;
+                closestPlanet = planet;
+            }
+        }
+    }
+
+    console.log(`Closest planet: ${closestPlanet.englishName}. Axial tilt: ${closestPlanet.axialTilt}`);
+    return closestPlanet.englishName;
+}
+
+async function findPlanetWithShortestDay() {
+    const bodiesData = await fetchSolarSystemData('bodies/');
+    const planets = bodiesData.bodies.filter(body => body.isPlanet);
+
+    let shortestDayPlanet = null;
+    let shortestDay = Infinity;
+
+    for (const planet of planets) {
+        if (planet.sideralRotation !== undefined){
+            const rotationPeriod = Math.abs(planet.sideralRotation);
+            if (rotationPeriod < shortestDay) {
+                shortestDay = rotationPeriod;
+                shortestDayPlanet = planet;
+            }
+        }
+    }
+    console.log(`Planet with the shortest day: ${shortestDayPlanet.englishName}. Sidereal rotation: ${shortestDay} hours`);
+    return shortestDayPlanet.englishName;
+}
+
 
 async function solveTask(task) {
-    try {
-        const startData = await startTask();
+    let answer = null;
 
-        let answer = null;
+    if (task === "sun_pin") {
+        answer = await sunPin();
+    } else if (task === "closest_axial_tilt") {
+        answer = await findClosestAxialTilt();
+    } else if (task === "shortest_day") {
+        answer = await findPlanetWithShortestDay();
+    } 
 
-        if (task === "sun_pin") {
-            answer = await sunPin();
-        } else if (task === "") {
-            answer = await null();
-        }
+    const answerResponse = await submitAnswer(answer);
 
-        const answerResponse = await submitAnswer(answer);
+    const skeletonKey = answerResponse?.skeletonKey;
+    if (skeletonKey) {
+        const fs = require('fs');
+        fs.writeFileSync('skeletonKey.txt', skeletonKey);
+        console.log('Skeleton Key saved in created txt document "skeletonKey.txt"');
+    }  
 
-        const skeletonKey = answerResponse?.skeletonKey;
-        if (skeletonKey) {
-            const fs = require('fs');
-            fs.writeFileSync('skeletonKey.txt', skeletonKey);
-            console.log('Skeleton Key saved in created txt document "skeletonKey.txt"');
-        }  
-    } catch (error) {
-        console.error('Error during mission:', error);
-    }
 }
 
-solveTask();
+async function runTasks() {
+
+    const startData = await startTask();
+    console.log("Task started:", startData);
+
+    await solveTask("sun_pin");
+
+    await solveTask("closest_axial_tilt");
+
+    await solveTask("shortest_day");
+}
+
+runTasks();
 
