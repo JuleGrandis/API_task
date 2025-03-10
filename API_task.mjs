@@ -90,6 +90,14 @@ async function findPlanetWithShortestDay() {
     return shortestDayPlanet.englishName;
 }
 
+async function findMoonsOnJupiter() {
+    const jupiterData = await fetchSolarSystemData('/bodies/jupiter');
+
+    const moonCount = jupiterData.moons.length;
+
+    console.log(`Jupiter has ${moonCount} moons.`);
+    return moonCount;
+}
 
 async function solveTask(task) {
     let answer = null;
@@ -100,7 +108,9 @@ async function solveTask(task) {
         answer = await findClosestAxialTilt();
     } else if (task === "shortest_day") {
         answer = await findPlanetWithShortestDay();
-    } 
+    } else if (task === "jupiter_moons") {
+        answer = await findMoonsOnJupiter();
+    }
 
     const answerResponse = await submitAnswer(answer);
 
@@ -123,6 +133,8 @@ async function runTasks() {
     await solveTask("closest_axial_tilt");
 
     await solveTask("shortest_day");
+
+    await solveTask("jupiter_moons");
 }
 
 runTasks();
