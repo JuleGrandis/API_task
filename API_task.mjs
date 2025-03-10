@@ -1,11 +1,9 @@
-import { futimesSync } from 'fs';
-
 import fetch from 'node-fetch';
 
 const PLAYER_EMAIL = 'aleksandnb@uia.no';
 
-const SOLAR_SYSTEM_API_URL = 'https://api.le-systeme-solaire.net/en/';
-const RIS_BASE_URL = 'https://spacescavanger.onrender.com/';
+const SOLAR_SYSTEM_API_URL = 'https://api.le-systeme-solaire.net/rest/';
+const RIS_BASE_URL = 'https://spacescavanger.onrender.com';
 
 async function startTask() {
     const response = await fetch(`${RIS_BASE_URL}/start?player=${PLAYER_EMAIL}`);
@@ -40,12 +38,14 @@ async function solveTask() {
     try {
         const startData = await startTask();
 
-        const plutoData = await fetchSolarSystemData('bodies/pluto');
+        const plutoData = await fetchSolarSystemData('/bodies/pluto');
         console.log('Pluto data:', plutoData);
 
         const plutoMass = plutoData.mass?.massValue;
+        let answerResponse = null;
+
         if (plutoMass) {
-            const answerResponse = await submitAnswer(plutoMass);
+            answerResponse = await submitAnswer(plutoMass);
             console.log('Answer: ', answerResponse);
         }
 
