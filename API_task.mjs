@@ -1,6 +1,6 @@
 import { futimesSync } from 'fs';
 
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 const PLAYER_EMAIL = 'aleksandnb@uia.no';
 
