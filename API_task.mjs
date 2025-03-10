@@ -15,14 +15,13 @@ async function startTask() {
 async function submitAnswer(answer) {
     const response = await fetch(`${RIS_BASE_URL}/answer`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             answer: answer,
             player: PLAYER_EMAIL,
         }),
     });
+
     const data = await response.json();
     console.log('Answer submitted:', data);
     return data;
@@ -38,16 +37,16 @@ async function solveTask() {
     try {
         const startData = await startTask();
 
-        const plutoData = await fetchSolarSystemData('/bodies/pluto');
-        console.log('Pluto data:', plutoData);
+        const sunData = await fetchSolarSystemData('/bodies/sun');
+        //console.log('Sun data:', sunData);
 
-        const plutoMass = plutoData.mass?.massValue;
-        let answerResponse = null;
+        const equatorialRadius = sunData.equaRadius;
+        const meanRadius = sunData.meanRadius;
 
-        if (plutoMass) {
-            answerResponse = await submitAnswer(plutoMass);
-            console.log('Answer: ', answerResponse);
-        }
+        const pinCode = equatorialRadius - meanRadius;
+        console.log(`Pin code: ${pinCode}`);
+
+        const answerResponse = await submitAnswer(pinCode);
 
         const skeletonKey = answerResponse?.skeletonKey;
         if (skeletonKey) {
