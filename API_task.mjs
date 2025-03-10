@@ -99,6 +99,29 @@ async function findMoonsOnJupiter() {
     return moonCount;
 }
 
+async function jupiterLargestMoon () {
+    const jupiterData = await fetchSolarSystemData('/bodies/jupiter');
+
+    let largestMoon = null;
+    let maxRadius = 0;
+
+    for (const moon of jupiterData.moons) {
+        try {
+            const moonId = moon.moon;
+            const moonData = await fetchSolarSystemData(`/bodies/${moonId}`);
+
+            if (moonData.meanRadius && moonData.meanRadius > maxRadius) {
+                maxRadius = moonData.meanRadius;
+                largestMoon = moonData.englishName;
+            }
+        } catch (error) {
+        }
+    }
+
+    console.log(`Largest moon on Jupiter: ${largestMoon} with a radius ${maxRadius} km`);
+    return largestMoon;
+}
+
 async function solveTask(task) {
     let answer = null;
 
@@ -110,6 +133,8 @@ async function solveTask(task) {
         answer = await findPlanetWithShortestDay();
     } else if (task === "jupiter_moons") {
         answer = await findMoonsOnJupiter();
+    } else if (task === "largest_moon") {
+        answer = await jupiterLargestMoon();
     }
 
     const answerResponse = await submitAnswer(answer);
@@ -135,6 +160,8 @@ async function runTasks() {
     await solveTask("shortest_day");
 
     await solveTask("jupiter_moons");
+
+    await solveTask("largest_moon")
 }
 
 runTasks();
