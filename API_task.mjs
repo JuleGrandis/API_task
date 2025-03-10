@@ -33,20 +33,27 @@ async function fetchSolarSystemData(endpoint) {
     return data;
 }
 
-async function solveTask() {
+async function sunPin () {
+    const sunData = await fetchSolarSystemData('/bodies/sun');
+
+    const pinCode = sunData.equatorialRadius - sunData.meanRadius;
+    console.log(`Pin code: ${pinCode}`);
+  
+}
+
+async function solveTask(task) {
     try {
         const startData = await startTask();
 
-        const sunData = await fetchSolarSystemData('/bodies/sun');
-        //console.log('Sun data:', sunData);
+        let answer = null;
 
-        const equatorialRadius = sunData.equaRadius;
-        const meanRadius = sunData.meanRadius;
+        if (task === "sun_pin") {
+            answer = await sunPin();
+        } else if (task === "") {
+            answer = await null();
+        }
 
-        const pinCode = equatorialRadius - meanRadius;
-        console.log(`Pin code: ${pinCode}`);
-
-        const answerResponse = await submitAnswer(pinCode);
+        const answerResponse = await submitAnswer(answer);
 
         const skeletonKey = answerResponse?.skeletonKey;
         if (skeletonKey) {
